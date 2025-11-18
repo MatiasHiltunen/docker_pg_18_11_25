@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import sql from "./db.js";
 import { zValidator } from "@hono/zod-validator";
 import * as z from "zod";
+import type { Row, RowList } from "postgres";
 
 const todoRoute = new Hono()
     .get("/",
@@ -11,9 +12,18 @@ const todoRoute = new Hono()
                 select id, title, description, is_completed, created_at, updated_at
                 from todo_items
                 order by created_at desc
-            `;
+            ` as {
+                id: number, 
+                title: string, 
+                description: string, 
+                is_completed: boolean, 
+                create_at: string,
+                updated_at: string
+            }[];
 
-            return c.json(rows);
+        
+
+            return c.json(rows );
         })
 
     .post("/",
@@ -48,13 +58,23 @@ const todoRoute = new Hono()
                 select id, title, description, is_completed, created_at, updated_at
                 from todo_items
                 where id = ${idNum}
-            `;
+            `
 
             if (rows.length === 0) {
                 return c.json({ error: "not found" }, 404);
             }
 
-            return c.json(rows[0]);
+
+            const row = rows.at(0) as {
+                id: number, 
+                title: string, 
+                description: string, 
+                is_completed: boolean, 
+                create_at: string,
+                updated_at: string
+            }
+
+            return c.json(row);
         })
 
     .patch("/:id",
