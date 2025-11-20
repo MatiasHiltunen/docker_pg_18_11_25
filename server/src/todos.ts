@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import sql from "./db.js";
 import { zValidator } from "@hono/zod-validator";
 import * as z from "zod";
-import type { Row, RowList } from "postgres";
 
 const todoRoute = new Hono()
     .get("/",
